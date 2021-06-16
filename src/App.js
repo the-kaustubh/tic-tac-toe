@@ -19,12 +19,12 @@ export default function App() {
   )
 
   useEffect(() => {
-    checkWin()
     if(turn) {
       // const { row, col } = getRndMove(board)
       const { row, col } = getBestMove(board)
       toggleBlock(row, col)
     }
+    checkWin()
   }, [turn]) //  eslint-disable-line react-hooks/exhaustive-deps
 
   function checkWin() {
@@ -40,8 +40,8 @@ export default function App() {
     const newBoard = board
     if(newBoard[row][column] === '') {
       newBoard[row][column] = (turn) ? 'X' : 'O'
+      setBoard({ board: newBoard, turn : !turn})
     }
-    setBoard({ board: newBoard, turn : !turn})
   }
 
   function clearBoard() {
