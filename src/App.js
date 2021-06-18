@@ -7,32 +7,59 @@ import checkWinner from './winner.js'
 import './App.css'
 
 export default function App() {
-  const [{board, turn}, setBoard] = useState(
+  const [{board, turn, game, player, winner}, setBoard] = useState(
     {
       board: [
         ['', '', ''],
         ['', '', ''],
         ['', '', ''],
       ],
-      turn: true
+      turn: true,
+      game: false,
+      player: true,
+      winner: null
     }
   )
 
   useEffect(() => {
-    if(turn) {
-      // const { row, col } = getRndMove(board)
-      const { row, col } = getBestMove(board)
-      toggleBlock(row, col)
-    }
+    play()
+    console.log({turn, player})
     checkWin()
-  }, [turn]) //  eslint-disable-line react-hooks/exhaustive-deps
+  }, [turn, player, game]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function play() {
+    if(turn === player) {
+      const { row, col } = getBestMove(board, player)
+      if(row !== null || col !== null) {
+        toggleBlock(row, col)
+      }
+    }
+  }
+
+  function changeSides() {
+    setBoard({
+      board: [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+      ],
+      turn: true,
+      game: false,
+      player: (player) ? false : true,
+      winner: null
+    })
+  }
 
   function checkWin() {
     const winner = checkWinner(board)
     if(winner) {
-      if(winner === 'T') alert('Tied')
-      else alert(winner + " is the winner")
-      clearBoard();
+      setBoard({
+        board: board,
+        turn: true,
+        game: true,
+        player: player,
+        winner: winner
+      })
     }
   }
 
@@ -40,19 +67,30 @@ export default function App() {
     const newBoard = board
     if(newBoard[row][column] === '') {
       newBoard[row][column] = (turn) ? 'X' : 'O'
-      setBoard({ board: newBoard, turn : !turn})
+      setBoard({
+        board: newBoard,
+        turn : !turn,
+        game: game,
+        player: player,
+        winner: winner
+      })
     }
   }
 
   function clearBoard() {
     setBoard({
-      turn: true,
       board: [
         ['', '', ''],
         ['', '', ''],
         ['', '', ''],
-      ]
+      ],
+      turn: true,
+      game: false,
+      player: player,
+      winner: null
     })
+    console.log({board, turn, game, player})
+    play()
   }
 
   return (
@@ -78,7 +116,19 @@ export default function App() {
         </tbody>
       </table>
     <button onClick={clearBoard}>Clear Game</button>
-    <h2>{turn ? 'X' : 'O'}'s Turn</h2>
+    <button onClick={changeSides}>Change Sides </button>
+    <div>
+    {
+      (game) 
+      ?  (winner === 'T')
+        ?  <h2> Game Over: Tie </h2>
+        : <h2> Game Over: {winner} wins </h2>
+      : <h2>{turn ? 'X' : 'O'}'s Turn</h2>
+    }
+    </div>
+    <div>
+      {player ? 'X' : 'O'}
+    </div>
     </div>
     </>
   )

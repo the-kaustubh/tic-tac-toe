@@ -6,7 +6,7 @@ const O = 'O'
 const scores = {
   'X': 1,
   'O': -1,
-  'T': 0 
+  'T': 0
 }
 
 export function getRndMove(board) {
@@ -25,14 +25,15 @@ export function getRndMove(board) {
   return avail[rndPair]
 }
 
-export function getBestMove(board) {
+export function getBestMove(board, side) {
   let bestScore = -Infinity
   let bestMove;
+  if(checkWinner(board)) return {row: null, col: null};
   for(let i = 0; i < 3; i++) {
     for(let j = 0; j < 3; j++) {
       if(board[i][j] === '') {
         board[i][j] = X
-        let score = minimax(board, 0, false)
+        let score = minimax(board, 0, false, side)
         board[i][j] = ''
         if( score > bestScore ) {
           bestScore = score
@@ -44,7 +45,7 @@ export function getBestMove(board) {
   return {row: bestMove.i, col: bestMove.j}
 }
 
-function minimax(board, depth, isMax) {
+function minimax(board, depth, isMax, side) {
   let result = checkWinner(board)
   if(result !== null) {
     return scores[result]
@@ -54,7 +55,7 @@ function minimax(board, depth, isMax) {
     for(let i = 0; i < 3; i++) {
       for(let j = 0; j < 3; j++) {
         if(board[i][j] === '') {
-          board[i][j] = X
+          board[i][j] = side ? 'X' : 'O'
           let score = minimax(board, depth + 1, false)
           board[i][j] = ''
           bestScore = Math.max(score, bestScore)
@@ -67,7 +68,7 @@ function minimax(board, depth, isMax) {
     for(let i = 0; i < 3; i++) {
       for(let j = 0; j < 3; j++) {
         if(board[i][j] === '') {
-          board[i][j] = O
+          board[i][j] = !side ? 'X' : 'O'
           let score = minimax(board, depth + 1, true)
           board[i][j] = ''
           bestScore = Math.min(score, bestScore)
